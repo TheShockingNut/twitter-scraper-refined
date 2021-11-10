@@ -5,15 +5,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver import Chrome
+from webdriver_manager.chrome import ChromeDriverManager
 
-driver = Chrome()
+driver = Chrome(ChromeDriverManager().install())
 
 driver.get('https://www.twitter.com/i/flow/login')
-
+time.sleep(3)
 email = input("Enter email: ")
 password = input("Enter password: ")
 uname = input("Enter username: ")
-url = input("give me an url to scan:\n")#https://twitter.com/search?q=%23ClimateActionNow&src=trend_click&f=live&vertical=trends
+url = input("Give me an url to scan:\n")#https://twitter.com/search?q=%23ClimateActionNow&src=trend_click&f=live&vertical=trends
 filename = "output.txt"#change file name to whatever you want
 counter = 0
 
@@ -35,7 +36,7 @@ def scraper(card):
     tweet_content = tweet_content.text
     responding_to = card.find_element_by_xpath('.//div[1]/div[1]/div[1]/div[2]/div[2]/div[2]/div[2]').text
     
-    with open(filename, 'ab') as f:
+    with open(filename, 'ab+') as f:
         output = 'Tweet Number: ' + str(counter) + '\n' + 'Username: '+ username + '\n' + 'User Handle: ' + user_id + '\n' + 'Content:\n' + tweet_content + '\n\n\n\n'
         f.write(output.encode())
 
@@ -64,12 +65,12 @@ try:
     time.sleep(2)
 except:
     print('Error')
-
-try:
-    WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@name='text']"))).send_keys(uname)
-    time.sleep(2)
-except:
-    print('Error')
+if bool(driver.find_elements(By.XPATH, "//input[@name='text']")):
+    try:
+        WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@name='text']"))).send_keys(uname)
+        time.sleep(2)
+    except:
+        print('Error')
 
 try:
     WebDriverWait(driver, 20).until(EC.element_to_be_clickable((By.XPATH, "//input[@name='text']"))).send_keys(Keys.RETURN)
@@ -99,7 +100,7 @@ while True:
             
             scraper(card)#calls the scraper
             counter+=1
-            time.sleep(1)
+            time.sleep(0.5)
             
     except Exception as error:
         print(error)
@@ -113,5 +114,3 @@ while True:
        driver.execute_script("window.scrollBy(0, 250)")
        # you can change time intervels between very scrolling
        time.sleep(1)
-
-
